@@ -13,12 +13,12 @@ Desktop application for generating valid, checksum-correct IBANs and personal ID
 
 ### Download
 
-Grab the latest binary for your OS from [Releases](https://github.com/Sunyata-OU/EU-Test-Data-GUI/releases).
+Grab the latest binary for your OS from [Releases](https://github.com/Sunyata-OU/EU-Test-Data-Generator-GUI/releases).
 
 ### Build from source
 
 ```bash
-git clone https://github.com/Sunyata-OU/EU-Test-Data-GUI.git
+git clone https://github.com/Sunyata-OU/EU-Test-Data-Generator-GUI.git
 cd EU-Test-Data-GUI
 cargo build --release
 # Binary at target/release/eu-test-data-gui
