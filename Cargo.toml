@@ -9,4 +9,4 @@ license = "MIT"
 [dependencies]
 eframe = "0.31"
 rand = "0.8"
-eu-test-data-generator = { path = "../eu-testing-data", default-features = false }
+eu-test-data-generator = { git = "https://github.com/Sunyata-OU/EU-Test-Data-Generator.git", default-features = false }
