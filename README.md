@@ -60,6 +60,16 @@ Click **Copy all** to copy all generated codes to your clipboard.
 
 See the [core library](https://github.com/Sunyata-OU/EU-Test-Data-Generator) for the full list.
 
+## Screenshots
+
+### IBAN tab
+
+![IBAN generation](assets/successful-run-mac.png)
+
+### Personal ID tab
+
+![Personal ID generation](assets/personal-id-run.png)
+
 ## License
 
 MIT
