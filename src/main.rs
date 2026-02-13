@@ -27,6 +27,7 @@ struct App {
     // IBAN state
     iban_country: String,
     iban_count: u32,
+    iban_spaces: bool,
     iban_results: Vec<IbanRow>,
 
     // Personal ID state
@@ -39,10 +40,13 @@ struct App {
     registry: personal_id::Registry,
     iban_countries: Vec<&'static str>,
     id_countries: Vec<(String, String)>,
+
+    copied_index: Option<(Tab, usize)>,
 }
 
 #[derive(Clone)]
 struct IbanRow {
+    raw: String,
     formatted: String,
     valid: bool,
 }
@@ -76,6 +80,7 @@ impl App {
             tab: Tab::Iban,
             iban_country: "DE".to_string(),
             iban_count: 5,
+            iban_spaces: true,
             iban_results: Vec::new(),
             id_country: "EE".to_string(),
             id_count: 5,
@@ -85,12 +90,14 @@ impl App {
             registry,
             iban_countries,
             id_countries,
+            copied_index: None,
         }
     }
 
     fn generate_ibans(&mut self) {
         let mut rng = thread_rng();
         self.iban_results.clear();
+        self.copied_index = None;
         let country = if self.iban_country == "Random" {
             None
         } else {
@@ -101,6 +108,7 @@ impl App {
                 let valid = iban::validate_iban(&code);
                 self.iban_results.push(IbanRow {
                     formatted: iban::format_iban(&code),
+                    raw: code,
                     valid,
                 });
             }
@@ -110,6 +118,7 @@ impl App {
     fn generate_ids(&mut self) {
         let mut rng = thread_rng();
         self.id_results.clear();
+        self.copied_index = None;
         let gender = match self.id_gender {
             GenderChoice::Any => None,
             GenderChoice::Male => Some(personal_id::date::Gender::Male),
@@ -131,14 +140,20 @@ impl App {
         }
     }
 
-    fn results_to_clipboard(&self, ui: &mut egui::Ui) {
+    fn copy_all_to_clipboard(&self, ui: &mut egui::Ui) {
         match self.tab {
             Tab::Iban => {
                 if !self.iban_results.is_empty() && ui.button("Copy all").clicked() {
                     let text: String = self
                         .iban_results
                         .iter()
-                        .map(|r| r.formatted.clone())
+                        .map(|r| {
+                            if self.iban_spaces {
+                                r.formatted.clone()
+                            } else {
+                                r.raw.clone()
+                            }
+                        })
                         .collect::<Vec<_>>()
                         .join("\n");
                     ui.ctx().copy_text(text);
@@ -191,25 +206,47 @@ impl eframe::App for App {
                         ui.label("Count:");
                         ui.add(egui::DragValue::new(&mut self.iban_count).range(1..=100));
 
+                        ui.checkbox(&mut self.iban_spaces, "Spaces");
+
                         if ui.button("Generate").clicked() {
                             self.generate_ibans();
                         }
-                        self.results_to_clipboard(ui);
+                        self.copy_all_to_clipboard(ui);
                     });
 
                     ui.add_space(8.0);
 
+                    let spaces = self.iban_spaces;
                     egui::ScrollArea::vertical().show(ui, |ui| {
                         egui::Grid::new("iban_grid")
                             .striped(true)
-                            .num_columns(2)
+                            .num_columns(3)
                             .show(ui, |ui| {
                                 ui.strong("IBAN");
                                 ui.strong("Valid");
+                                ui.strong("");
                                 ui.end_row();
-                                for row in &self.iban_results {
-                                    ui.monospace(&row.formatted);
+                                for (i, row) in self.iban_results.iter().enumerate() {
+                                    let display = if spaces {
+                                        &row.formatted
+                                    } else {
+                                        &row.raw
+                                    };
+                                    ui.monospace(display);
                                     ui.label(if row.valid { "Yes" } else { "No" });
+                                    let copied =
+                                        matches!(self.copied_index, Some((Tab::Iban, idx)) if idx == i);
+                                    if ui
+                                        .button(if copied { "Copied!" } else { "Copy" })
+                                        .clicked()
+                                    {
+                                        ui.ctx().copy_text(if spaces {
+                                            row.formatted.clone()
+                                        } else {
+                                            row.raw.clone()
+                                        });
+                                        self.copied_index = Some((Tab::Iban, i));
+                                    }
                                     ui.end_row();
                                 }
                             });
@@ -251,7 +288,7 @@ impl eframe::App for App {
                         if ui.button("Generate").clicked() {
                             self.generate_ids();
                         }
-                        self.results_to_clipboard(ui);
+                        self.copy_all_to_clipboard(ui);
                     });
 
                     ui.add_space(8.0);
@@ -259,18 +296,27 @@ impl eframe::App for App {
                     egui::ScrollArea::vertical().show(ui, |ui| {
                         egui::Grid::new("id_grid")
                             .striped(true)
-                            .num_columns(4)
+                            .num_columns(5)
                             .show(ui, |ui| {
                                 ui.strong("Code");
                                 ui.strong("Gender");
                                 ui.strong("Date of Birth");
                                 ui.strong("Valid");
+                                ui.strong("");
                                 ui.end_row();
-                                for row in &self.id_results {
+                                for (i, row) in self.id_results.iter().enumerate() {
                                     ui.monospace(&row.code);
                                     ui.label(&row.gender);
                                     ui.label(&row.dob);
                                     ui.label(if row.valid { "Yes" } else { "No" });
+                                    let copied = matches!(self.copied_index, Some((Tab::PersonalId, idx)) if idx == i);
+                                    if ui
+                                        .button(if copied { "Copied!" } else { "Copy" })
+                                        .clicked()
+                                    {
+                                        ui.ctx().copy_text(row.code.clone());
+                                        self.copied_index = Some((Tab::PersonalId, i));
+                                    }
                                     ui.end_row();
                                 }
                             });

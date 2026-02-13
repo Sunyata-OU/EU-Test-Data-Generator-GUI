@@ -1,6 +1,6 @@
 [package]
 name = "eu-test-data-gui"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 authors = ["Tony Benoy <me@tonybenoy.com>"]
 description = "Desktop GUI for generating valid test IBANs and personal ID codes"
