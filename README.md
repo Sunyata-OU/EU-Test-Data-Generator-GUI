@@ -60,11 +60,15 @@ Click **Copy all** to copy all generated codes to your clipboard.
 
 See the [core library](https://github.com/Sunyata-OU/EU-Test-Data-Generator) for the full list.
 
-## Screenshot
+## Screenshots
 
-Example of the application generating valid IBANs and personal IDs:
+### IBAN tab
 
-![Successful run showing IBAN and Personal ID generation](assets/successful-run-mac.png)
+![IBAN generation](assets/successful-run-mac.png)
+
+### Personal ID tab
+
+![Personal ID generation](assets/personal-id-run.png)
 
 ## License
 
