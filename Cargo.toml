@@ -1,0 +1,12 @@
+[package]
+name = "eu-test-data-gui"
+version = "0.1.0"
+edition = "2024"
+authors = ["Tony Benoy <me@tonybenoy.com>"]
+description = "Desktop GUI for generating valid test IBANs and personal ID codes"
+license = "MIT"
+
+[dependencies]
+eframe = "0.31"
+rand = "0.8"
+eu-test-data-generator = { path = "../eu-testing-data", default-features = false }
