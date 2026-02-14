@@ -1,5 +1,7 @@
 # EU Test Data Generator — Desktop GUI
 
+> **⚠️ DEPRECATED**: This project has been deprecated in favor of [MockBanker](https://tonybenoy.github.io/mockbanker/). Please use MockBanker for generating test banking data.
+
 Desktop application for generating valid, checksum-correct IBANs and personal ID codes. Built with [egui](https://github.com/emilk/egui), powered by [eu-test-data-generator](https://github.com/Sunyata-OU/EU-Test-Data-Generator).
 
 ## Features
